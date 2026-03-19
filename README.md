@@ -56,3 +56,39 @@ practice/      ← 練習用テンプレート（空欄を埋める）
 - Prisma（ORM）
 - Zod（バリデーション）
 - http-status-codes
+
+---
+
+## React フロントエンド版
+
+バックエンドの `routes → controllers → repositories` パターンに対応する
+フロントエンド版 `components → hooks → api` パターンを練習するための構成です。
+
+```
+frontend-react/    ← 完成版（答え・リファレンス）
+practice-react/    ← 練習用テンプレート（空欄を埋める）
+```
+
+### 対応関係
+
+| バックエンド | フロントエンド | 役割 |
+|---|---|---|
+| `repositories/` | `api/` | データ取得層（DB / fetch） |
+| `controllers/` | `hooks/` | ビジネスロジック・状態管理 |
+| `routes/` | `components/` | 入出力・UI |
+
+### React 版の練習メニュー
+
+| # | 操作 | ディレクトリ | 実装するもの |
+|---|------|-------------|-------------|
+| 01 | Create（作成） | `practice-react/01_create/` | api + hook + component |
+| 02 | List（一覧） | `practice-react/02_list/` | api + hook + component |
+| 03 | Find（詳細） | `practice-react/03_find/` | api + hook + component |
+| 04 | Update（更新） | `practice-react/04_update/` | api + hook + component |
+| 05 | Delete（削除） | `practice-react/05_delete/` | api + hook + component |
+
+### React 版の技術スタック（想定）
+
+- React 18+
+- TypeScript
+- Fetch API（ライブラリなし）
