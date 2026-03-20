@@ -1,94 +1,69 @@
 # Todo CRUD 練習リポジトリ
 
-バックエンドの「ルーティング → コントローラー → リポジトリ」パターンを
-空手の型・柔道の打ち込みのように反復練習するためのリポジトリです。
+バックエンド・フロントエンドの CRUD パターンを、解説を読みながらタイピングして身につけるためのリポジトリです。
 
 ---
 
 ## ディレクトリ構成
 
 ```
-src/           ← 完成版（答え・リファレンス）
-practice/      ← 練習用テンプレート（空欄を埋める）
+practice/          ← バックエンド練習（Express + Prisma）
+practice-react/    ← フロントエンド練習（React + Fetch API）
 ```
 
 ---
 
 ## 練習の進め方
 
-### Step 1: 答えを読んで理解する
+各ディレクトリに `README.md` が1ファイルあります。
 
-`src/` の以下の順番で読む：
-
-1. `types/todo.ts` — 型定義
-2. `repositories/ITodoRepository.ts` — インターフェース
-3. `repositories/TodoRepository.ts` — データ層（モデル）
-4. `controllers/` — ビジネスロジック層
-5. `routes/todos.ts` — ルーティング層
-
-### Step 2: 練習テンプレートを埋める
-
-`practice/` の各ディレクトリに `DRILL.md` があります。
-指示に従い、**リポジトリ → コントローラー → ルーター** の順番で空欄を埋める。
-
-### Step 3: 見ずに書けるまで繰り返す
-
-`practice/` のファイルを削除 → 何も見ずに再作成 → `src/` と照合
+1. **解説を読む** — 「なぜそう書くのか」まで理解する
+2. **ドリルを打ち込む** — TODO を埋めながら自分でタイピングする
+3. **`<details>` で答え合わせ** — 確認したら閉じる
+4. **見ずに書けるまで繰り返す** — README を閉じて最初から書き直す
 
 ---
 
-## CRUD 練習メニュー
+## バックエンド練習メニュー（`practice/`）
 
-| # | 操作 | ディレクトリ | ミドルウェア |
-|---|------|-------------|-------------|
-| 01 | Create（作成） | `practice/01_create/` | authHandler + validator |
-| 02 | List（一覧） | `practice/02_list/` | authHandler のみ |
-| 03 | Find（詳細） | `practice/03_find/` | authHandler のみ |
-| 04 | Update（更新） | `practice/04_update/` | authHandler + validator |
-| 05 | Delete（削除） | `practice/05_delete/` | authHandler のみ |
+パターン: `ルーター → コントローラー → リポジトリ`
 
----
+| # | 内容 | ミドルウェア |
+|---|------|-------------|
+| [00_auth](./practice/00_auth/README.md) | JWT・authHandler・userId の取得フロー | — |
+| [01_create](./practice/01_create/README.md) | POST /todos（新規作成） | authHandler + validator |
+| [02_list](./practice/02_list/README.md) | GET /todos（一覧・ページネーション） | authHandler のみ |
+| [03_find](./practice/03_find/README.md) | GET /todos/:id（1件取得） | authHandler のみ |
+| [04_update](./practice/04_update/README.md) | PUT /todos/:id（更新） | authHandler + validator |
+| [05_delete](./practice/05_delete/README.md) | DELETE /todos/:id（削除） | authHandler のみ |
 
-## 技術スタック（想定）
+### 技術スタック
 
-- TypeScript
-- Express
-- Prisma（ORM）
-- Zod（バリデーション）
-- http-status-codes
+- TypeScript / Express / Prisma / Zod / http-status-codes
 
 ---
 
-## React フロントエンド版
+## フロントエンド練習メニュー（`practice-react/`）
 
-バックエンドの `routes → controllers → repositories` パターンに対応する
-フロントエンド版 `components → hooks → api` パターンを練習するための構成です。
+パターン: `コンポーネント → フック → API 関数`
 
-```
-frontend-react/    ← 完成版（答え・リファレンス）
-practice-react/    ← 練習用テンプレート（空欄を埋める）
-```
-
-### 対応関係
+バックエンドの各層に対応している：
 
 | バックエンド | フロントエンド | 役割 |
 |---|---|---|
 | `repositories/` | `api/` | データ取得層（DB / fetch） |
-| `controllers/` | `hooks/` | ビジネスロジック・状態管理 |
-| `routes/` | `components/` | 入出力・UI |
+| `controllers/` | `hooks/` | 状態管理・ビジネスロジック |
+| `routes/` | `components/` | UI・イベント処理 |
 
-### React 版の練習メニュー
+| # | 内容 | 実装するもの |
+|---|------|-------------|
+| [00_setup](./practice-react/00_setup/README.md) | 型定義・API共通ユーティリティ | types / getHeaders / handleResponse |
+| [01_create](./practice-react/01_create/README.md) | POST /todos（新規作成） | api + hook + component |
+| [02_list](./practice-react/02_list/README.md) | GET /todos（一覧） | api + hook + component |
+| [03_find](./practice-react/03_find/README.md) | GET /todos/:id（1件取得） | api + hook + component |
+| [04_update](./practice-react/04_update/README.md) | PUT /todos/:id（更新） | api + hook + component |
+| [05_delete](./practice-react/05_delete/README.md) | DELETE /todos/:id（削除） | api + hook + component |
 
-| # | 操作 | ディレクトリ | 実装するもの |
-|---|------|-------------|-------------|
-| 01 | Create（作成） | `practice-react/01_create/` | api + hook + component |
-| 02 | List（一覧） | `practice-react/02_list/` | api + hook + component |
-| 03 | Find（詳細） | `practice-react/03_find/` | api + hook + component |
-| 04 | Update（更新） | `practice-react/04_update/` | api + hook + component |
-| 05 | Delete（削除） | `practice-react/05_delete/` | api + hook + component |
+### 技術スタック
 
-### React 版の技術スタック（想定）
-
-- React 18+
-- TypeScript
-- Fetch API（ライブラリなし）
+- React 18+ / TypeScript / Fetch API
