@@ -28,9 +28,19 @@ practice-react/    ← フロントエンド練習（React + Fetch API）
 
 パターン: `ルーター → コントローラー → リポジトリ`
 
+### 基礎知識（先に読む）
+
+| ファイル | 内容 |
+|---|---|
+| [00_express](./practice/00_express/README.md) | req / res / next / Router / メソッドチェーンの仕組み |
+| [00_middleware](./practice/00_middleware/README.md) | ミドルウェアの概念・logger / authHandler / validator / errorHandler のドリル |
+| [00_auth](./practice/00_auth/README.md) | JWT・userId の取得フロー（authHandler の背景） |
+| [00_prisma](./practice/00_prisma/README.md) | Prisma の基礎・CRUD メソッド・エラーコード・Promise.all |
+
+### CRUD ドリル
+
 | # | 内容 | ミドルウェア |
 |---|------|-------------|
-| [00_auth](./practice/00_auth/README.md) | JWT・authHandler・userId の取得フロー | — |
 | [01_create](./practice/01_create/README.md) | POST /todos（新規作成） | authHandler + validator |
 | [02_list](./practice/02_list/README.md) | GET /todos（一覧・ページネーション） | authHandler のみ |
 | [03_find](./practice/03_find/README.md) | GET /todos/:id（1件取得） | authHandler のみ |
