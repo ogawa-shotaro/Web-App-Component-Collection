@@ -4,23 +4,137 @@
 
 ```
 PUT /todos/:id
-  └─ authHandler          ← 認証チェック
-  └─ validator(schema)    ← バリデーション
-  └─ controller.execute() ← ビジネスロジック
-       └─ repository.update() ← 存在しなければ NotFoundError（P2025）
+  └─ authHandler              ← JWT を検証して req.user.id をセット
+  └─ validator(schema)        ← req.body を Zod でバリデーション
+  └─ controller.execute()     ← id, userId, body を取り出す
+       └─ repository.update() ← 見つからなければ NotFoundError（P2025）
 ```
 
 ---
 
-## リポジトリ
+## 解説
 
-- `prisma.todo.update()` で `id` と `userId` を where 条件にする
-- `PrismaClientKnownRequestError` の `code === "P2025"` は「対象が存在しない」エラー → `NotFoundError` に変換する
-- それ以外のエラーは `throw error` で再スローする
+### リポジトリ（TodoRepository.update）
+
+`prisma.todo.update()` は対象レコードが**存在しない場合に例外を投げる**。
+`findUnique` のように `null` を返すのではなく、直接エラーになる点が `findById` と異なる。
+
+Prisma が投げるエラーは `PrismaClientKnownRequestError` という型で、
+`error.code` に Prisma 独自のエラーコードが入っている。
+
+| コード | 意味 |
+|---|---|
+| `P2025` | 対象レコードが見つからなかった |
+| `P2002` | ユニーク制約違反 |
+
+`P2025` を検知したら `NotFoundError` に変換して投げ直す。
+それ以外のエラーは `throw error` で再スローし、上位に処理を任せる。
+
+`where: { id, userId }` で**自分の Todo だけ**を更新対象にしている点は findById と同じ。
+
+### コントローラー（UpdateTodoController）
+
+パスパラメータの変数名が `id`（findById や delete の `todoId` と**違う**）。
+これは `TodoUpdateParams` 型の定義に合わせたもの（`id` というフィールド名）。
+
+```typescript
+// src/types/todo.ts
+export type TodoUpdateParams = {
+  id: number;    // ← findById は todoId なのに update は id
+  userId: number;
+  title: string;
+  body: string;
+};
+```
+
+`req.body` は `validator(updateTodoSchema)` 通過後なので、`title` と `body` が保証されている。
+
+### ルーター
+
+PUT は body があるため、`validator(updateTodoSchema)` が必要。
+`createTodoSchema` と `updateTodoSchema` は現在同じ定義だが、
+将来的に「更新時はオプションフィールドを許可する」などの差異が生まれることを想定して分けてある。
+
+---
+
+## ドリル
+
+### リポジトリ
 
 ```typescript
 // src/repositories/TodoRepository.ts（update メソッド）
 
+async update({ id, userId, title, body }: TodoUpdateParams): Promise<Todo> {
+  try {
+    // TODO: prisma.todo.update() を呼び出す
+    //       where: { id, userId }、data: { title, body }
+    return await prisma.todo.update({
+      where: { /* TODO */ },
+      data: { /* TODO */ },
+    });
+  } catch (error) {
+    // TODO: error が PrismaClientKnownRequestError かつ code が "P2025" なら
+    //       NotFoundError を投げる
+    if (
+      /* TODO: instanceof チェック */ &&
+      /* TODO: code チェック */
+    ) {
+      throw new NotFoundError("Todoが見つかりませんでした");
+    }
+    // TODO: それ以外は再スロー
+  }
+}
+```
+
+### コントローラー
+
+```typescript
+// src/controllers/UpdateTodoController.ts
+
+export class UpdateTodoController {
+  // TODO: コンストラクタを書く
+
+  async execute(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      // TODO: req.params.id を Number に変換して id とする（todoId ではなく id）
+
+      // TODO: req.user.id から userId を取り出す
+
+      // TODO: req.body から title と body を分割代入で取り出す
+
+      // TODO: this.repository.update() を呼び出して todo に代入する
+
+      // TODO: 200 OK で todo を返す
+    } catch (error) {
+      // TODO: エラーを next に渡す
+    }
+  }
+}
+```
+
+### ルーター
+
+```typescript
+// src/routes/todos.ts（PUT /:id 部分）
+
+// TODO: PUT /:id のルートを定義する
+//       ミドルウェア: authHandler → validator(updateTodoSchema) → controller.execute()
+todoRouter
+  .route("/:id")
+  .put(/* TODO */);
+```
+
+---
+
+<details>
+<summary>答え（確認用）</summary>
+
+**リポジトリ**
+```typescript
 async update({ id, userId, title, body }: TodoUpdateParams): Promise<Todo> {
   try {
     return await prisma.todo.update({
@@ -39,23 +153,8 @@ async update({ id, userId, title, body }: TodoUpdateParams): Promise<Todo> {
 }
 ```
 
----
-
-## コントローラー
-
-- `req.params.id` を `Number()` で変換して `id` とする（delete の `todoId` と名前が違う点に注意）
-- `req.body` から `title`, `body` を取り出す
-- `req.user.id` から `userId` を取り出す
-- `StatusCodes.OK`（200）で返す
-
+**コントローラー**
 ```typescript
-// src/controllers/UpdateTodoController.ts
-
-import { Response, NextFunction } from "express";
-import { StatusCodes } from "http-status-codes";
-import { ITodoRepository } from "../repositories/ITodoRepository";
-import { AuthenticatedRequest } from "../types/request";
-
 export class UpdateTodoController {
   constructor(private readonly repository: ITodoRepository) {}
 
@@ -79,19 +178,13 @@ export class UpdateTodoController {
 }
 ```
 
----
-
-## ルーター
-
-- `PUT /:id` に対応
-- ミドルウェアの順番: `authHandler` → `validator(updateTodoSchema)` → コントローラー
-
+**ルーター**
 ```typescript
-// src/routes/todos.ts（PUT /:id部分）
-
 todoRouter
   .route("/:id")
   .put(authHandler, validator(updateTodoSchema), (req, res, next) => {
     updateController.execute(req, res, next);
   });
 ```
+
+</details>
